@@ -82,11 +82,112 @@ router.post("/login", async (req, res) => {
         services: salon.services,
         workingHours: salon.workingHours,
         image: salon.image,
+        salonType: salon.salonType,
+        coordinates: salon.coordinates
       },
     });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ✅ Google login for salon owners
+router.post('/google-login', async (req, res) => {
+  const { name, email, photoURL } = req.body;
+
+  if (!email) return res.status(400).json({ message: 'Missing email' });
+
+  try {
+    let salon = await Salon.findOne({ email });
+    if (!salon) {
+      // Create new salon with minimal data for Google auth
+      salon = new Salon({ 
+        name, 
+        email, 
+        phone: '',
+        password: await bcrypt.hash(Math.random().toString(36), 10), // Random password for Google auth
+        location: '',
+        workingHours: { start: '09:00', end: '18:00' },
+        services: [],
+        salonType: 'Hair Salon',
+        coordinates: { lat: 0, lng: 0 },
+        image: photoURL || null,
+        isGoogleAuth: true
+      });
+      await salon.save();
+    } else {
+      // Update existing salon's photo
+      if (photoURL) {
+        salon.image = photoURL;
+        await salon.save();
+      }
+    }
+
+    res.json({
+      message: "Google login successful",
+      salon: {
+        id: salon._id,
+        name: salon.name,
+        email: salon.email,
+        phone: salon.phone,
+        location: salon.location,
+        services: salon.services,
+        workingHours: salon.workingHours,
+        image: salon.image,
+        salonType: salon.salonType,
+        coordinates: salon.coordinates,
+        isGoogleAuth: salon.isGoogleAuth
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// ✅ Phone login for salon owners
+router.post('/phone-login', async (req, res) => {
+  const { phone, name } = req.body;
+
+  if (!phone) return res.status(400).json({ message: 'Missing phone number' });
+
+  try {
+    let salon = await Salon.findOne({ phone });
+    if (!salon) {
+      // Create new salon with minimal data for phone auth
+      salon = new Salon({ 
+        name: name || 'Phone Salon Owner', 
+        email: '',
+        phone,
+        password: await bcrypt.hash(Math.random().toString(36), 10), // Random password for phone auth
+        location: '',
+        workingHours: { start: '09:00', end: '18:00' },
+        services: [],
+        salonType: 'Hair Salon',
+        coordinates: { lat: 0, lng: 0 },
+        isPhoneAuth: true
+      });
+      await salon.save();
+    }
+
+    res.json({
+      message: "Phone login successful",
+      salon: {
+        id: salon._id,
+        name: salon.name,
+        email: salon.email,
+        phone: salon.phone,
+        location: salon.location,
+        services: salon.services,
+        workingHours: salon.workingHours,
+        image: salon.image,
+        salonType: salon.salonType,
+        coordinates: salon.coordinates,
+        isPhoneAuth: salon.isPhoneAuth
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
 

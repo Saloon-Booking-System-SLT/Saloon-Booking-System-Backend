@@ -17,6 +17,7 @@ const appointmentRoutes = require("./routes/appointmentRoutes");
 const userRoutes = require('./routes/userRoutes');
 const feedbackRoutes = require("./routes/feedbackRoutes");
 const familybookingRoutes = require("./routes/familybookingRoutes");
+const adminRoutes = require('./routes/adminRoutes');
 
 // Initialize Express app
 const app = express();
@@ -64,10 +65,11 @@ app.use('/api/professionals', apiLimiter, professionalRoutes);
 app.use('/api/timeslots', apiLimiter, timeSlotRoutes);
 app.use('/api/appointments', apiLimiter, appointmentRoutes);
 app.use("/api/feedback", apiLimiter, feedbackRoutes);
+app.use("/api/familybooking", apiLimiter, familybookingRoutes);
+app.use('/api/admin', apiLimiter, adminRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/uploads/services", express.static(path.join(__dirname, "uploads/services")));
 app.use("/uploads/professionals", express.static(path.join(__dirname, "uploads/professionals")));
-app.use("/api/familybooking", apiLimiter, familybookingRoutes);
 
 // Default route
 app.get('/', (req, res) => {
