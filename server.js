@@ -53,8 +53,8 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log("✅ MongoDB connected"))
-.catch((err) => console.error("❌ MongoDB connection error:", err));
+.then(() => console.log("MongoDB connected"))
+.catch((err) => console.error("MongoDB connection error:", err));
 
 // API Routes with rate limiting
 app.use('/api/users', apiLimiter, userRoutes);
@@ -71,7 +71,7 @@ app.use("/api/familybooking", apiLimiter, familybookingRoutes);
 
 // Default route
 app.get('/', (req, res) => {
-  res.send('✅ Salon API is running!');
+  res.send('Salon API is running!');
 });
 
 // Health check endpoint
@@ -101,5 +101,5 @@ app.use((err, req, res, next) => {
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running at http://localhost:${PORT}`);
+  console.log(`Server is running at http://localhost:${PORT}`);
 });
